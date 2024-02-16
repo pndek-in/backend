@@ -9,10 +9,10 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "db-create": "sequelize db:create",
-    "migrate": "sequelize db:migrate",
-    "seed": "sequelize db:seed:all",
-    "init": "npm run db-create && npm run migrate && npm run seed"
+    "db-create": "npx sequelize db:create",
+    "migrate": "npx sequelize db:migrate",
+    "seed": "npx sequelize db:seed:all",
+    "init-deploy": "npm run db-create && npm run migrate && npm run seed"
   },
   "dependencies": {
     "@maxmind/geoip2-node": "^5.0.0",
