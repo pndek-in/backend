@@ -314,6 +314,9 @@ class LinkController {
         }
       )
 
+      console.log(ipInfo, " | ipInfo");
+      console.log(ipInfo.ip, " | ipInfo.ip");
+
       const geolite = await client.city(ipInfo.ip)
       country = geolite.country.names.en
       city = geolite.city.names.en
