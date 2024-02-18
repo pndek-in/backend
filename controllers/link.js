@@ -314,10 +314,13 @@ class LinkController {
         }
       )
 
-      console.log(ipInfo, " | ipInfo");
-      console.log(ipInfo.ip, " | ipInfo.ip");
+      let ipAddress = ipInfo.ip
+      // If IP address includes comma, extract the first one
+      if (ipAddress.includes(',')) {
+        ipAddress = ipAddress.split(',')[0].trim();
+      }
 
-      const geolite = await client.city(ipInfo.ip)
+      const geolite = await client.city(ipAddress)
       country = geolite.country.names.en
       city = geolite.city.names.en
     } catch (error) {
