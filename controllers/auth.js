@@ -12,10 +12,9 @@ class AuthController {
         throw { status: 400, message: "Email and password are required" }
       }
 
-      const hashedPassword = await hash(password)
       const user = await User.create({
         email,
-        password: hashedPassword,
+        password,
         name,
         isVerified: false
       })
