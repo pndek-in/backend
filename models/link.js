@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Link.belongsTo(models.User, {
-        foreignKey: "userId"
+        foreignKey: "userId",
       })
       Link.hasMany(models.Click, {
         foreignKey: "linkId"

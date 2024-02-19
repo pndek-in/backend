@@ -154,12 +154,17 @@ class LinkController {
     }
   }
 
-  static async CreateLink(req, res, next) {
+  static async CreateLinkHelper(payload) {
     try {
-      const { url, description, expiredAt, secretCode } = req.body
-      const { source } = req.query || "web"
-      const { userData } = req
-      const status = STATUS.ACTIVE
+      const {
+        url,
+        description,
+        expiredAt,
+        secretCode,
+        status,
+        userId,
+        source
+      } = payload
 
       if (!url) throw { status: 400, message: "Original URL is required" }
 
@@ -176,8 +181,31 @@ class LinkController {
         expiredAt,
         secretCode,
         status,
-        userId: userData.userId,
+        userId,
         source
+      })
+
+      return newLink
+    } catch (error) {
+      throw error
+    }
+  }
+
+  static async CreateLink(req, res, next) {
+    try {
+      const { url, description, expiredAt, secretCode } = req.body
+      const { source } = req.query
+      const { userData } = req
+      const status = STATUS.ACTIVE
+
+      const newLink = await LinkController.CreateLinkHelper({
+        url,
+        description,
+        expiredAt,
+        secretCode,
+        status,
+        userId: userData.userId,
+        source: source || "web"
       })
 
       res.status(201).json({
@@ -192,6 +220,87 @@ class LinkController {
           userId: newLink.userId,
           createdAt: newLink.createdAt,
           hasSecretCode: !!newLink.secretCode
+        }
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  static async CreateLinkWithoutAuth(req, res, next) {
+    try {
+      const { url, description, expiredAt, secretCode } = req.body
+      const { source } = req.query
+      const status = STATUS.ACTIVE
+
+      const newLink = await LinkController.CreateLinkHelper({
+        url,
+        description,
+        expiredAt,
+        secretCode,
+        status,
+        userId: 1,
+        source: source || "web"
+      })
+
+      res.status(201).json({
+        message: "Link is successfully created",
+        data: {
+          linkId: newLink.linkId,
+          url: newLink.url,
+          path: newLink.path,
+          description: newLink?.description,
+          status: newLink.status,
+          expiredAt: newLink?.expiredAt,
+          userId: newLink.userId,
+          createdAt: newLink.createdAt,
+          hasSecretCode: !!newLink.secretCode
+        }
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  static async ClaimLink(req, res, next) {
+    try {
+      const { id } = req.body
+      const { userData } = req
+
+      const link = await Link.findByPk(id)
+
+      if (!link) {
+        throw { status: 404, message: "Link not found" }
+      }
+
+      if (link.userId !== 1) {
+        throw { status: 400, message: "Link is already claimed" }
+      }
+
+      const updatedLink = await Link.update(
+        {
+          userId: userData.userId
+        },
+        {
+          where: {
+            linkId: id
+          },
+          returning: true
+        }
+      )
+
+      res.status(200).json({
+        message: "Link is successfully claimed",
+        data: {
+          linkId: updatedLink[1][0].linkId,
+          url: updatedLink[1][0].url,
+          path: updatedLink[1][0].path,
+          description: updatedLink[1][0]?.description,
+          status: updatedLink[1][0].status,
+          expiredAt: updatedLink[1][0]?.expiredAt,
+          userId: updatedLink[1][0].userId,
+          createdAt: updatedLink[1][0].createdAt,
+          hasSecretCode: !!updatedLink[1][0].secretCode
         }
       })
     } catch (error) {
@@ -316,8 +425,8 @@ class LinkController {
 
       let ipAddress = ipInfo.ip
       // If IP address includes comma, extract the first one
-      if (ipAddress.includes(',')) {
-        ipAddress = ipAddress.split(',')[0].trim();
+      if (ipAddress.includes(",")) {
+        ipAddress = ipAddress.split(",")[0].trim()
       }
 
       const geolite = await client.city(ipAddress)

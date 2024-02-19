@@ -11,4 +11,7 @@ routes.patch("/link/status/:id", authenticate, authorizeLink, Link.UpdateLinkSta
 routes.post("/link/short/:path", Link.FindUniqueLink)
 routes.post("/link/public/create", Link.CreateLink)
 
+routes.post("/link/noauth/create", Link.CreateLinkWithoutAuth)
+routes.post("/link/noauth/claim", authenticate, Link.ClaimLink)
+
 module.exports = routes
