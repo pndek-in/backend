@@ -157,7 +157,7 @@ class LinkController {
   static async CreateLink(req, res, next) {
     try {
       const { url, description, expiredAt, secretCode } = req.body
-      const { source } = req.query || "web"
+      const { source } = req.query
       const { userData } = req
       const status = STATUS.ACTIVE
 
@@ -177,7 +177,7 @@ class LinkController {
         secretCode,
         status,
         userId: userData.userId,
-        source
+        source: source || "web"
       })
 
       res.status(201).json({
