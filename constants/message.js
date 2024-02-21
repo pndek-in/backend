@@ -6,4 +6,5 @@ module.exports = MESSAGE = {
   UNIQUE_URL: "url_is_already_registered",
   NOT_FOUND_URL: "url_not_found",
   UNAUTHORIZED: "unauthorized",
+  UNVERIFIED_USER: "unverified_user",
 }
