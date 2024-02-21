@@ -150,14 +150,35 @@ class AuthController {
 
   static async GetMe(req, res, next) {
     try {
-      const { userData } = req
+      const userData = req.userData
 
       res.status(200).json({
         message: "Get user data is successful",
         data: {
-          isVerified: user.isVerified,
-          email: userData.email,
-          name: userData.name
+          isVerified: userData.isVerified,
+          id: userData.userId,
+        }
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  static async GenerateTelegramToken(req, res, next) {
+    try {
+      const { userData } = req
+      const token = generateToken({
+        tokenType: "telegram",
+        tokenData: {
+          id: userData.userId,
+          isVerified: userData.isVerified
+        }
+      })
+
+      res.status(200).json({
+        message: "Token is successfully generated",
+        data: {
+          token
         }
       })
     } catch (error) {

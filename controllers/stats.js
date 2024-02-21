@@ -106,7 +106,8 @@ class StatsController {
     isUserStats,
     referrerData,
     browserData,
-    deviceData
+    deviceData,
+    osData
   }) {
     const results = []
     const limit = 5
@@ -161,6 +162,14 @@ class StatsController {
       values: Object.values(sortedDeviceData).slice(0, limit)
     })
 
+    const sortedOsData = sortObjectByValue(osData)
+    results.push({
+      title: "clicks-by-os",
+      column: "os",
+      labels: Object.keys(sortedOsData).slice(0, limit),
+      values: Object.values(sortedOsData).slice(0, limit)
+    })
+
     return results
   }
 
@@ -182,6 +191,7 @@ class StatsController {
     const referrerData = {}
     const browserData = {}
     const deviceData = {}
+    const osData = {}
 
     links.forEach((link) => {
       // Counting clicks
@@ -246,7 +256,7 @@ class StatsController {
         }
 
         // Assigning Device Data
-        const { browser, device } = parser(click.userAgent)
+        const { browser, device, os } = parser(click.userAgent)
         if (browser) {
           const browserName = browser.name || "N/A"
           if (browserData[browserName]) {
@@ -262,6 +272,15 @@ class StatsController {
             deviceData[deviceType]++
           } else {
             deviceData[deviceType] = 1
+          }
+        }
+        
+        if (os) {
+          const osName = os.name || "N/A"
+          if (osData[osName]) {
+            osData[osName]++
+          } else {
+            osData[osName] = 1
           }
         }
       })
@@ -292,7 +311,8 @@ class StatsController {
       isUserStats,
       referrerData,
       browserData,
-      deviceData
+      deviceData,
+      osData
     })
 
     return result
