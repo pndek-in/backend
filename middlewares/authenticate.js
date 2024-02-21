@@ -17,7 +17,7 @@ const authenticate = async (req, res, next) => {
     }
 
     const user = await User.findByPk(userId)
-    if (!user) {
+    if (!user || user.email !== email) {
       throw { status: 401, message: MESSAGE.INVALID_TOKEN }
     }
 
