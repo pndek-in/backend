@@ -171,7 +171,8 @@ class AuthController {
         tokenType: "telegram",
         tokenData: {
           id: userData.userId,
-          isVerified: userData.isVerified
+          isVerified: userData.isVerified,
+          email: userData.email
         }
       })
 
