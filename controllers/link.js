@@ -10,7 +10,8 @@ const {
   compareHash,
   hash,
   isURLSafe,
-  appendHttps
+  appendHttps,
+  isURLValid
 } = require("../utils")
 
 class LinkController {
@@ -168,9 +169,13 @@ class LinkController {
 
       if (!url) throw { status: 400, message: "Original URL is required" }
 
-      const isURLValid = await isURLSafe(url)
+      const isUrlSafe = await isURLSafe(url)
 
-      if (!isURLValid) throw { status: 400, message: "URL is not safe" }
+      if (!isUrlSafe) throw { status: 400, message: "URL is not safe" }
+
+      const isUrlValid = isURLValid(url)
+
+      if (!isUrlValid) throw { status: 400, message: "URL is not valid" }
 
       const path = await LinkController.generateRandomPath()
 
@@ -320,7 +325,7 @@ class LinkController {
         expiredAt
       }
 
-      if (path !== existingData.path) {
+      if (path && path !== existingData.path) {
         const isPathExist = await Link.findOne({
           where: {
             path
@@ -332,12 +337,19 @@ class LinkController {
           throw { status: 400, message: "New path is already taken" }
         }
 
+        const isPathValid = isURLValid(`pndek.in/${path}`)
+
+        if (!isPathValid) {
+          throw { status: 400, message: "New path is not valid" }
+        }
+
         payload.path = path
       }
 
       if (secretCode) {
         payload.secretCode = newSecret
       }
+
 
       const link = await Link.update(payload, {
         where: {
