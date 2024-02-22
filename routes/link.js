@@ -16,5 +16,6 @@ routes.post("/link/noauth/claim", authenticate, Link.ClaimLink)
 
 routes.post("/link/bot/create", authenticateBot, Link.CreateLink)
 routes.get("/link/bot/lists", authenticateBot, Link.GetLinkList)
+routes.put("/link/bot/edit/:id", authenticateBot, authorizeLink, Link.UpdateLink)
 
 module.exports = routes
