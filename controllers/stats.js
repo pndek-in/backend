@@ -32,7 +32,8 @@ class StatsController {
     uniqueVisitor,
     qrCodeVisits,
     isUserStats,
-    activeLink
+    activeLink,
+    createdUsingTelegram
   }) {
     const countersStats = []
     // Assign counters
@@ -67,6 +68,15 @@ class StatsController {
         value: qrCodeVisits
       }
     )
+
+    if (isUserStats) {
+      countersStats.push(
+        {
+          title: "created-using-telegram",
+          value: createdUsingTelegram
+        }
+      )
+    }
 
     return countersStats
   }
@@ -180,6 +190,7 @@ class StatsController {
     let uniqueVisitor = {}
     let qrCodeVisits = 0
     let activeLink = 0
+    let createdUsingTelegram = 0
 
     // CHART
     const chartData = {}
@@ -204,6 +215,11 @@ class StatsController {
       }
       if (link.status === 1) {
         activeLink++
+      }
+
+      // Counting Telegram Data
+      if (link.source === "telegram") {
+        createdUsingTelegram++
       }
 
       link.Clicks.forEach((click) => {
@@ -304,7 +320,8 @@ class StatsController {
       uniqueVisitor,
       qrCodeVisits,
       isUserStats,
-      activeLink
+      activeLink,
+      createdUsingTelegram
     })
 
     result.chart = StatsController.AssignChartStats({ chartData, start, end })
