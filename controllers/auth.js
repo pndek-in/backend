@@ -109,10 +109,21 @@ class AuthController {
           email: user.email
         })
 
+        // Update isVerified to true if it's false if user login with google
+        if (!user.isVerified) {
+          User.update({
+            isVerified: true
+          }, {
+            where: {
+              userId: user.userId
+            }
+          })
+        }
+
         res.status(200).json({
           message: "Login is successful",
           data: {
-            isVerified: user.isVerified,
+            isVerified: true,
             email: user.email,
             name: user.name,
             token

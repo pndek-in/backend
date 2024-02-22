@@ -248,10 +248,15 @@ class StatsController {
 
         // Assigning Referrer Data
         if (click.referrer) {
-          if (referrerData[click.referrer]) {
-            referrerData[click.referrer]++
+          let referrer = click.referrer
+          if (referrer.includes("//")) {
+            referrer = referrer.split("//")[1]
+          }
+
+          if (referrerData[referrer]) {
+            referrerData[referrer]++
           } else {
-            referrerData[click.referrer] = 1
+            referrerData[referrer] = 1
           }
         }
 
