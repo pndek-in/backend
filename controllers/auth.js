@@ -59,13 +59,14 @@ If you didn't create an account with us, please ignore this email.
         where: {
           email: tokenData.email
         },
-        attributes: ["userId", "email"]
+        attributes: ["userId", "email", "isVerified"]
       })
 
       if (
         !user ||
         user.userId !== tokenData.id ||
-        user.email !== tokenData.email
+        user.email !== tokenData.email ||
+        user.isVerified
       ) {
         throw { status: 400, message: "Invalid token" }
       }
