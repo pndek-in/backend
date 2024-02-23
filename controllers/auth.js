@@ -39,7 +39,7 @@ If you didn't create an account with us, please ignore this email.
 
     transporter.sendMail(mail, (err) => {
       if (err) {
-        console.log(err, ' | error from nodemailer')
+        console.log(err, " | error from nodemailer")
       } else {
         console.log("Email sent!", mail)
       }
@@ -83,6 +83,23 @@ If you didn't create an account with us, please ignore this email.
 
       res.status(200).json({
         message: "Email is successfully verified"
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  static async RequestVerifEmail(req, res, next) {
+    try {
+      const userData = req.userData
+
+      AuthController.SendVerificationEmail({
+        user: userData,
+        email: userData.email
+      })
+
+      res.status(200).json({
+        message: "Verification email is successfully sent"
       })
     } catch (error) {
       next(error)
