@@ -48,5 +48,10 @@ module.exports = (sequelize, DataTypes) => {
     record.dataValues.password = hashedPassword
   })
 
+  User.beforeBulkUpdate((record, options) => {
+    const now = new Date()
+    record.attributes.updatedAt = convertToUnixTimestamp(now)
+  })
+
   return User
 }

@@ -2,9 +2,111 @@
 const { OAuth2Client } = require("google-auth-library")
 
 const { User } = require("../models")
-const { compareHash, hash, generateToken, generateRandomString } = require("../utils")
+const {
+  compareHash,
+  hash,
+  generateToken,
+  generateRandomString,
+  decodeToken
+} = require("../utils")
+const transporter = require("../config/nodemailer")
 
 class AuthController {
+  static async SendVerificationEmail({ user, email }) {
+    const mailToken = generateToken({
+      tokenType: "email",
+      tokenData: {
+        id: user.userId,
+        email: user.email
+      }
+    })
+
+    const message = `
+Hello, ${user.name}! Please verify your email address by clicking the link below:
+
+https://app.pndek.in/verify?t=${mailToken}
+
+If you didn't create an account with us, please ignore this email.
+`
+
+    const mail = {
+      from: process.env.SMTP_EMAIL,
+      to: email,
+      subject: "Verify your email address to access our service at pndek.in",
+      text: message,
+      replyTo: process.env.SMTP_EMAIL
+    }
+
+    transporter.sendMail(mail, (err) => {
+      if (err) {
+        console.log(err, " | error from nodemailer")
+      } else {
+        console.log("Email sent!", mail)
+      }
+    })
+  }
+
+  static async VerifyEmail(req, res, next) {
+    try {
+      const { token } = req.query
+      const { tokenType, tokenData } = decodeToken(token)
+
+      if (tokenType !== "email" || !tokenData.email || !tokenData.id) {
+        throw { status: 400, message: "Invalid token" }
+      }
+
+      const user = await User.findOne({
+        where: {
+          email: tokenData.email
+        },
+        attributes: ["userId", "email", "isVerified"]
+      })
+
+      if (
+        !user ||
+        user.userId !== tokenData.id ||
+        user.email !== tokenData.email ||
+        user.isVerified
+      ) {
+        throw { status: 400, message: "Invalid token" }
+      }
+
+      await User.update(
+        {
+          isVerified: true
+        },
+        {
+          where: {
+            userId: user.userId
+          }
+        }
+      )
+
+      res.status(200).json({
+        message: "Email is successfully verified"
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  static async RequestVerifEmail(req, res, next) {
+    try {
+      const userData = req.userData
+
+      AuthController.SendVerificationEmail({
+        user: userData,
+        email: userData.email
+      })
+
+      res.status(200).json({
+        message: "Verification email is successfully sent"
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
   static async Register(req, res, next) {
     try {
       const { email, password, name } = req.body
@@ -23,6 +125,8 @@ class AuthController {
         userId: user.userId,
         email: user.email
       })
+
+      AuthController.SendVerificationEmail({ user, email })
 
       res.status(201).json({
         message: "User is successfully created",
@@ -111,13 +215,16 @@ class AuthController {
 
         // Update isVerified to true if it's false if user login with google
         if (!user.isVerified) {
-          User.update({
-            isVerified: true
-          }, {
-            where: {
-              userId: user.userId
+          User.update(
+            {
+              isVerified: true
+            },
+            {
+              where: {
+                userId: user.userId
+              }
             }
-          })
+          )
         }
 
         res.status(200).json({
@@ -167,7 +274,7 @@ class AuthController {
         message: "Get user data is successful",
         data: {
           isVerified: userData.isVerified,
-          id: userData.userId,
+          id: userData.userId
         }
       })
     } catch (error) {
