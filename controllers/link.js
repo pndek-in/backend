@@ -482,12 +482,12 @@ class LinkController {
         where: {
           path
         },
-        attributes: ["linkId", "url", "expiredAt", "secretCode", "totalClick"]
+        attributes: ["linkId", "url", "expiredAt", "secretCode", "totalClick", "status"]
       })
 
       if (!link) throw { status: 404, message: "Link is not found" }
 
-      if (link.status === 0) throw { status: 410, message: "Link is inactive" }
+      if (link.status !== 1) throw { status: 410, message: "Link is inactive" }
 
       let hasSecretCode = !!link.secretCode
       const now = convertToUnixTimestamp(new Date())
