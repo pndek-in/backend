@@ -149,7 +149,7 @@ class LinkController {
     })
     if (link) {
       // if link is exist, generate new random string
-      return LinkController.generateRandomUrl()
+      return LinkController.generateRandomPath()
     } else {
       return randomString
     }
