@@ -1,12 +1,12 @@
 "use strict"
 const { OAuth2Client } = require("google-auth-library")
+const { randomize } = require("string-randomify")
 
 const { User } = require("../models")
 const {
   compareHash,
   hash,
   generateToken,
-  generateRandomString,
   decodeToken
 } = require("../utils")
 const transporter = require("../config/nodemailer")
@@ -237,7 +237,7 @@ If you didn't create an account with us, please ignore this email.
           }
         })
       } else {
-        const random = generateRandomString(8)
+        const random = randomize(8)
         const hashedPassword = await hash(random)
         const newUser = await User.create({
           email,
