@@ -1,10 +1,10 @@
 "use strict"
 const { Op } = require("sequelize")
+const { randomize } = require("string-randomify")
 const WebServiceClient = require("@maxmind/geoip2-node").WebServiceClient
 const { Link, Click } = require("../models")
 const { STATUS } = require("../constants")
 const {
-  generateRandomString,
   convertToUnixTimestamp,
   compareUnixTimestamp,
   compareHash,
@@ -140,7 +140,7 @@ class LinkController {
   }
 
   static async generateRandomPath() {
-    const randomString = generateRandomString(5)
+    const randomString = randomize(5)
     const link = await Link.findOne({
       where: {
         path: randomString
