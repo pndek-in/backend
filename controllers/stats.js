@@ -2,22 +2,23 @@
 const { Op } = require("sequelize")
 const dayjs = require("dayjs")
 const parser = require("ua-parser-js")
-const { Link, Click, User } = require("../models")
+const Redis = require("../controllers/redis")
+const { Link, Click } = require("../models")
 const { sortObjectByValue } = require("../utils")
 
 class StatsController {
   static async GetHomeStats(req, res, next) {
     try {
-      const totalUser = await User.count()
-      const totalLink = await Link.count()
-      const totalClick = await Click.count()
+      const totalUser = (await Redis.GetRedis("totalUser")) || 0
+      const totalLink = (await Redis.GetRedis("totalLink")) || 0
+      const totalClick = (await Redis.GetRedis("totalClick")) || 0
 
       res.status(200).json({
         message: "Stats is successfully retrieved",
         data: {
-          totalUser,
-          totalLink,
-          totalClick
+          totalUser: Number(totalUser),
+          totalLink: Number(totalLink),
+          totalClick: Number(totalClick)
         }
       })
     } catch (error) {
@@ -70,12 +71,10 @@ class StatsController {
     )
 
     if (isUserStats) {
-      countersStats.push(
-        {
-          title: "created-using-telegram",
-          value: createdUsingTelegram
-        }
-      )
+      countersStats.push({
+        title: "created-using-telegram",
+        value: createdUsingTelegram
+      })
     }
 
     return countersStats
@@ -295,7 +294,7 @@ class StatsController {
             deviceData[deviceType] = 1
           }
         }
-        
+
         if (os) {
           const osName = os.name || "N/A"
           if (osData[osName]) {
