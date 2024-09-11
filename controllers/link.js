@@ -2,6 +2,8 @@
 const { Op } = require("sequelize")
 const { randomize } = require("string-randomify")
 const WebServiceClient = require("@maxmind/geoip2-node").WebServiceClient
+
+const Redis = require("../controllers/redis")
 const { Link, Click } = require("../models")
 const { STATUS } = require("../constants")
 const {
@@ -190,6 +192,8 @@ class LinkController {
         source
       })
 
+      Redis.UpdateRedis("totalLink")
+
       return newLink
     } catch (error) {
       throw error
@@ -350,7 +354,6 @@ class LinkController {
         payload.secretCode = newSecret
       }
 
-
       const link = await Link.update(payload, {
         where: {
           linkId: id
@@ -458,6 +461,8 @@ class LinkController {
       city
     })
 
+    Redis.UpdateRedis("totalClick")
+
     Link.update(
       {
         totalClick: link.totalClick + 1
@@ -482,7 +487,14 @@ class LinkController {
         where: {
           path
         },
-        attributes: ["linkId", "url", "expiredAt", "secretCode", "totalClick", "status"]
+        attributes: [
+          "linkId",
+          "url",
+          "expiredAt",
+          "secretCode",
+          "totalClick",
+          "status"
+        ]
       })
 
       if (!link) throw { status: 404, message: "Link is not found" }

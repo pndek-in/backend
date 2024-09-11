@@ -2,13 +2,9 @@
 const { OAuth2Client } = require("google-auth-library")
 const { randomize } = require("string-randomify")
 
+const Redis = require("../controllers/redis")
 const { User } = require("../models")
-const {
-  compareHash,
-  hash,
-  generateToken,
-  decodeToken
-} = require("../utils")
+const { compareHash, hash, generateToken, decodeToken } = require("../utils")
 const transporter = require("../config/nodemailer")
 
 class AuthController {
@@ -127,6 +123,7 @@ If you didn't create an account with us, please ignore this email.
       })
 
       AuthController.SendVerificationEmail({ user, email })
+      Redis.UpdateRedis("totalUser")
 
       res.status(201).json({
         message: "User is successfully created",
@@ -250,6 +247,8 @@ If you didn't create an account with us, please ignore this email.
           userId: newUser.userId,
           email: newUser.email
         })
+
+        Redis.UpdateRedis("totalUser")
 
         res.status(201).json({
           message: "User is successfully created",
