@@ -445,8 +445,8 @@ class LinkController {
       }
 
       const geolite = await client.city(ipAddress)
-      country = geolite.country.names.en
-      city = geolite.city.names.en
+      country = geolite?.country?.names?.en || "N/A"
+      city = geolite?.city?.names?.en || "N/A"
     } catch (error) {
       console.log(error, " | error from geolite")
     }
