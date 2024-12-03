@@ -1,5 +1,5 @@
 import { expect, test } from "vitest"
-const { appendHttps, isURLValid } = require("./url")
+const { appendHttps, isURLValid } = require("../utils/url")
 
 test('appendHttps', () => {
   expect(appendHttps("http://example.com")).toBe("http://example.com")
