@@ -15,4 +15,6 @@ test('isURLValid', () => {
   expect(isURLValid("https://example.com?query=1")).toBe(true)
   expect(isURLValid("https://example.com#contactme")).toBe(true)
   expect(isURLValid("https://example.com/download/module.pdf")).toBe(true)
+
+  expect(isURLValid("pndek.in/TestMe")).toBe(true)
 })

@@ -49,7 +49,7 @@ const appendHttps = (url) => {
 
 const isURLValid = (url) => {
   const pattern = new RegExp(
-    /^(ftp|http|https):\/\/[^\s/$.?#].[^\s]*$|^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    /^(ftp|http|https):\/\/[^\s/$.?#].[^\s]*$|^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}([/][^\s]*)?$/
   )
 
   return pattern.test(url)
