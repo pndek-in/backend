@@ -2,7 +2,7 @@
 const { Op } = require("sequelize")
 const { randomize } = require("string-randomify")
 const WebServiceClient = require("@maxmind/geoip2-node").WebServiceClient
-const isBot = require("isbot")
+const { isbot } = require("isbot")
 
 const Redis = require("../controllers/redis")
 const { Link, Click } = require("../models")
@@ -529,7 +529,7 @@ class LinkController {
               throw { status: 400, message: "Secret code is invalid" }
             } else {
               hasSecretCode = false
-              if (!isBot(userAgent)) {
+              if (!isbot(userAgent)) {
                 LinkController.InsertClickData({
                   link,
                   userAgent,
@@ -543,7 +543,7 @@ class LinkController {
           }
         }
       } else {
-        if (!isBot(userAgent)) {
+        if (!isbot(userAgent)) {
           LinkController.InsertClickData({
             link,
             userAgent,
