@@ -6,7 +6,7 @@ const { isBot } = require("isbot")
 
 const Redis = require("../controllers/redis")
 const { Link, Click } = require("../models")
-const { STATUS } = require("../constants")
+const { STATUS, PATH } = require("../constants")
 const {
   convertToUnixTimestamp,
   compareUnixTimestamp,
@@ -150,12 +150,12 @@ class LinkController {
       },
       attributes: ["path"]
     })
-    if (link) {
-      // if link is exist, generate new random string
+
+    if (link || PATH.UNAUTHORIZED.includes(randomString)) {
+      // if link is exist or path is unauthorized, generate new random string
       return LinkController.generateRandomPath()
-    } else {
-      return randomString
     }
+    return randomString
   }
 
   static async CreateLinkHelper(payload) {
@@ -340,6 +340,13 @@ class LinkController {
 
         if (isPathExist) {
           throw { status: 400, message: "New path is already taken" }
+        }
+
+        if (PATH.UNAUTHORIZED.includes(path)) {
+          throw {
+            status: 400,
+            message: "New path is not allowed to use"
+          }
         }
 
         const isPathValid = isURLValid(`pndek.in/${path}`)
