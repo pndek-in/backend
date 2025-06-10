@@ -2,7 +2,7 @@
 const { Op } = require("sequelize")
 const { randomize } = require("string-randomify")
 const WebServiceClient = require("@maxmind/geoip2-node").WebServiceClient
-const { isBot } = require("isbot")
+const isBot = require("isbot")
 
 const Redis = require("../controllers/redis")
 const { Link, Click } = require("../models")
