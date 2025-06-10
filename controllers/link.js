@@ -529,6 +529,7 @@ class LinkController {
               throw { status: 400, message: "Secret code is invalid" }
             } else {
               hasSecretCode = false
+              console.info(userAgent, " | user agent")
               if (!isbot(userAgent)) {
                 LinkController.InsertClickData({
                   link,
@@ -543,6 +544,7 @@ class LinkController {
           }
         }
       } else {
+        console.info(userAgent, " | user agent")
         if (!isbot(userAgent)) {
           LinkController.InsertClickData({
             link,
